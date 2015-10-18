@@ -1,8 +1,9 @@
 # Registry Scraper
 
 This is a simple tool to pull particular images from a Docker registry, preserving the Docker
-registry file structure. This is useful for example if you want to ship a registry containing only
-a subset of the images contained in a registry.
+registry file structure, in essence creating a 'shallow clone' of a registry. This is useful for
+example if you want to ship a registry containing only a subset of the images contained in a
+registry.
 
 It requires direct access to the storage backend of the registry; it does not use the registry API.
 
@@ -25,6 +26,7 @@ docker run -d -p 5000:5000 --restart=always --name registry \
 ```
 
 ### Populate With Images
+
 Now you can push images to it:
 
 ```bash
