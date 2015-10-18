@@ -136,7 +136,7 @@ def copy_paths(paths, data_dir, output_dir):
                 path = os.path.join(path, '*')
             try:
                 os.makedirs(new_dir)
-            except FileExistsError:
+            except OSError:
                 pass
             print("copying {} to {}".format(path, new_path))
             os.system('rsync -avzr {} {}'.format(

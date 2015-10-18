@@ -1,6 +1,6 @@
 pull-test-image-internet:
-	sudo docker pull debian:jessie
-	sudo docker tag debian:jessie localhost:5000/debian:jessie
+	sudo docker pull busybox:latest
+	sudo docker tag busybox:latest localhost:5000/busybox:latest
 
 run-initial-registry:
 	sudo docker run -d -p 5000:5000 --restart=always --name registry \
@@ -9,17 +9,17 @@ run-initial-registry:
 	sleep 3
 
 push-images:
-	sudo docker push localhost:5000/debian:jessie
+	sudo docker push localhost:5000/busybox:latest
 
 delete-images:
-	-sudo docker rmi -f debian:jessie localhost:5000/debian:jessie
+	-sudo docker rmi -f busybox:latest localhost:5000/busybox:latest
 
 stop-initial-registry:
 	-sudo docker stop registry
 	-sudo docker rm registry
 
 scrape:
-	./scrape.py debian:jessie
+	./scrape.py busybox:latest
 
 run-final-registry:
 	sudo docker run -d -p 5000:5000 --restart=always --name registry \
@@ -31,7 +31,7 @@ diff:
 	diff -r data data-copy
 
 pull-test-image-local:
-	sudo docker pull localhost:5000/debian:jessie
+	sudo docker pull localhost:5000/busybox:latest
 
 test: pull-test-image-internet run-initial-registry push-images delete-images stop-initial-registry scrape run-final-registry diff pull-test-image-local
 
