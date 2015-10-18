@@ -58,6 +58,6 @@ docker run -d -p 5000:5000 --restart=always --name registry \
 ## Testing
 
 Currently there are no unit tests for this script. To run a functional end-to-end test, simply run
-`make clean && make test`. This will download the debian:jessie docker image, run a local storage
+`make clean && make test`. This will download the busybox:latest docker image, run a local storage
 registry, push the image, run the scraper, test that the new directory structure is identical to
 the original one, and finally attempt to pull the image from a new registry.
