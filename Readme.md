@@ -19,7 +19,7 @@ is running with the option `--insecure-registry localhost:5000`.
 To run a registry, run `make run-initial-registry` or do it manually with
 
 ```bash
-
+docker run -d -p 5000:5000 --restart=always --name registry \
 	-v `pwd`/data:/var/lib/registry \
 	registry:2
 ```
