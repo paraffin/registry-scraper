@@ -7,10 +7,10 @@ import os
 from pprint import pprint
 
 def get_blob_path_from_sha(sha, data_dir):
-    type, sha = sha.split(':')
+    sha_type, sha = sha.split(':')
     path = os.path.join(data_dir,
                         'docker/registry/v2/blobs/',
-                        type,
+                        sha_type,
                         sha[:2],
                         sha,
                         'data')
@@ -19,12 +19,12 @@ def get_blob_path_from_sha(sha, data_dir):
     
 
 def get_layer_path_from_sha(sha, image, data_dir):
-    type, sha = sha.split(':')
+    sha_type, sha = sha.split(':')
     path = os.path.join(data_dir,
                         'docker/registry/v2/repositories/',
                         image,
                         '_layers',
-                        type,
+                        sha_type,
                         sha,
                         'link')
     assert os.path.exists(path), "Could not find file at {}".format(path)
@@ -32,14 +32,14 @@ def get_layer_path_from_sha(sha, image, data_dir):
     
 
 def get_index_path_from_sha(sha, image, tag, data_dir):
-    type, sha = sha.split(':')
+    sha_type, sha = sha.split(':')
     path = os.path.join(data_dir,
                         'docker/registry/v2/repositories/',
                         image,
                         '_manifests/tags',
                         tag,
                         'index',
-                        type,
+                        sha_type,
                         sha,
                         'link')
     assert os.path.exists(path), "Could not find file at {}".format(path)
@@ -47,12 +47,12 @@ def get_index_path_from_sha(sha, image, tag, data_dir):
     
 
 def get_revision_path_from_sha(sha, image, data_dir):
-    type, sha = sha.split(':')
+    sha_type, sha = sha.split(':')
     path = os.path.join(data_dir,
                         'docker/registry/v2/repositories/',
                         image,
                         '_manifests/revisions',
-                        type,
+                        sha_type,
                         sha)
     assert os.path.exists(path), "Could not find file at {}".format(path)
     return path
