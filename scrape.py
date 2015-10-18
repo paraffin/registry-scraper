@@ -147,8 +147,6 @@ def main(args):
     image, tag = split_image_and_tag(args.image)
     paths = get_paths_to_copy(image, tag, args.data_dir)
 
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
     copy_paths(paths, args.data_dir, args.output_dir)
 
 
