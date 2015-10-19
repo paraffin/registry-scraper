@@ -33,7 +33,10 @@ diff:
 pull-test-image-local:
 	sudo docker pull localhost:5000/busybox:latest
 
-test: pull-test-image-internet run-initial-registry push-images delete-images stop-initial-registry scrape diff run-final-registry pull-test-image-local
+test-image:
+	docker run --rm localhost:5000/busybox:latest echo "I'm working!"
+
+test: pull-test-image-internet run-initial-registry push-images delete-images stop-initial-registry scrape diff run-final-registry pull-test-image-local test-image
 
 clean: stop-initial-registry delete-images
 	sudo rm -rf data data-copy
