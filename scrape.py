@@ -82,8 +82,7 @@ class Scraper():
         paths = set()
         for dirpath, _, link in os.walk(signatures_path):
             if link:
-                with open(os.path.join(dirpath, link[0]), 'r') as f:
-                    sha = f.read()
+                sha = self.storage.read_file(os.path.join(dirpath, link[0]))
                 blob = self._get_blob_path_from_sha(sha)
                 paths.add(blob)
 
