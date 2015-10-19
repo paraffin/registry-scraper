@@ -29,3 +29,6 @@ class LocalStorage(object):
         with open(path, 'r') as f:
             out = f.read()
         return out
+
+    def isdir(self, path):
+        return os.path.isdir(path)

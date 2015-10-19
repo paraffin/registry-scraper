@@ -99,7 +99,6 @@ class Scraper():
         paths.add(manifests_path)
 
         manifest_link = os.path.join(manifests_path, 'current/link')
-
         manifest_sha = self.storage.read_file(manifest_link)
         manifest_path = self._get_blob_path_from_sha(manifest_sha)
         paths.add(manifest_path)
@@ -121,7 +120,7 @@ class Scraper():
                 new_path = os.path.join(output_dir, rel_path)
                 new_dir = os.path.dirname(new_path)
                 _ensure_dir(new_dir)
-                if os.path.isdir(path):
+                if self.storage.isdir(path):
                     _ensure_dir(new_path)
                 self.storage.copy(path, new_path)
 
@@ -135,13 +134,9 @@ def _split_image_and_tag(full_image_name):
 def main(args):
     scraper = Scraper(args)
     paths = set()
-
     for img in args.image:
         image, tag = _split_image_and_tag(img)
         paths.update(scraper.get_paths(image, tag))
-
-    pprint(paths)
-
     scraper.copy_paths(paths, args.output_dir)
 
 
