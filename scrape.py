@@ -6,113 +6,11 @@ import os
 
 from pprint import pprint
 
-def get_blob_path_from_sha(sha, data_dir):
-    sha_type, sha = sha.split(':')
-    path = os.path.join(data_dir,
-                        'docker/registry/v2/blobs/',
-                        sha_type,
-                        sha[:2],
-                        sha,
-                        'data')
-    assert os.path.exists(path), "Could not find file at {}".format(path)
-    return path
-    
-
-def get_layer_path_from_sha(sha, image, data_dir):
-    sha_type, sha = sha.split(':')
-    path = os.path.join(data_dir,
-                        'docker/registry/v2/repositories/',
-                        image,
-                        '_layers',
-                        sha_type,
-                        sha,
-                        'link')
-    assert os.path.exists(path), "Could not find file at {}".format(path)
-    return path
-    
-
-def get_index_path_from_sha(sha, image, tag, data_dir):
-    sha_type, sha = sha.split(':')
-    path = os.path.join(data_dir,
-                        'docker/registry/v2/repositories/',
-                        image,
-                        '_manifests/tags',
-                        tag,
-                        'index',
-                        sha_type,
-                        sha,
-                        'link')
-    assert os.path.exists(path), "Could not find file at {}".format(path)
-    return path
-    
-
-def get_revision_path_from_sha(sha, image, data_dir):
-    sha_type, sha = sha.split(':')
-    path = os.path.join(data_dir,
-                        'docker/registry/v2/repositories/',
-                        image,
-                        '_manifests/revisions',
-                        sha_type,
-                        sha)
-    assert os.path.exists(path), "Could not find file at {}".format(path)
-    return path
-
-
-def get_signature_blob_paths(revision_path, data_dir, paths):
-    signatures_path = os.path.join(revision_path,
-                                   'signatures')
-    for dirpath, _, link in os.walk(signatures_path):
-        if link:
-            with open(os.path.join(dirpath, link[0]), 'r') as f:
-                sha = f.read()
-            blob = get_blob_path_from_sha(sha, data_dir)
-            paths.add(blob)
-    
-
-def get_manifest(image, tag, data_dir, paths):
-    manifest_link = os.path.join(data_dir,
-                                 'docker/registry/v2/repositories',
-                                 image,
-                                 '_manifests/tags/',
-                                 tag,
-                                 'current/link')
-    paths.add(manifest_link)
-    with open(manifest_link, 'r') as link:
-        sha = link.read()
-    blob = get_blob_path_from_sha(sha, data_dir)
-    paths.add(blob)
-    
-    with open(blob, 'r') as manifest_file:
-        manifest = json.load(manifest_file)
-
-    index_path = get_index_path_from_sha(sha, image, tag, data_dir)
-    paths.add(index_path)
-
-    revision_path = get_revision_path_from_sha(sha, image, data_dir)
-    paths.add(revision_path)
-
-    signature_path = get_signature_blob_paths(revision_path, data_dir, paths)
-    paths.add(signature_path)
-
-    return manifest
-
-
-
-def get_paths_to_copy(image, tag, data_dir):
-    paths = set()
-
-    paths.add(get_uploads_path(image, data_dir))
-
-    manifest = get_manifest(image, tag, data_dir, paths)
-    for item in manifest['fsLayers']:
-        blob_path = get_blob_path_from_sha(item['blobSum'], data_dir)
-        paths.add(blob_path)
-        layer_path = get_layer_path_from_sha(item['blobSum'], image, data_dir)
-        paths.add(layer_path)
-
-    pprint(paths)
-    return paths
-
+def _ensure_dir(path):
+    try:
+        os.makedirs(path)
+    except OSError:
+        pass
 
 class Scraper():
 
@@ -130,29 +28,105 @@ class Scraper():
                             image,
                             '_uploads')
 
+    def _get_manifests_path(self, image, tag):
+        return os.path.join(self.storage.data_dir,
+                            'docker/registry/v2/repositories',
+                            image,
+                            '_manifests/tags',
+                            tag)
+
+    def _get_blob_path_from_sha(self, sha):
+        sha_type, sha = sha.split(':')
+        return os.path.join(self.storage.data_dir,
+                            'docker/registry/v2/blobs/',
+                            sha_type,
+                            sha[:2],
+                            sha,
+                            'data')
+    
+    def _get_layer_link_from_sha(self, image, sha):
+        sha_type, sha = sha.split(':')
+        return os.path.join(self.storage.data_dir,
+                            'docker/registry/v2/repositories/',
+                            image,
+                            '_layers',
+                            sha_type,
+                            sha,
+                            'link')
+
+    def _get_layers(self, image, manifest):
+        layer_shas = set()
+        for elem in manifest['fsLayers']:
+            layer_shas.add(elem['blobSum'])
+
+        layer_paths = set()
+        for layer_sha in layer_shas:
+            layer_paths.add(self._get_blob_path_from_sha(layer_sha))
+            layer_paths.add(self._get_layer_link_from_sha(image, layer_sha))
+
+        return layer_paths
+
+    def _get_revision_path_from_sha(self, sha, image):
+        sha_type, sha = sha.split(':')
+        return os.path.join(self.storage.data_dir,
+                            'docker/registry/v2/repositories/',
+                            image,
+                            '_manifests/revisions',
+                            sha_type,
+                            sha)
+
+    def _get_signature_blob_paths(self, sha, image):
+        revision_path = self._get_revision_path_from_sha(sha, image)
+        signatures_path = os.path.join(revision_path,
+                                       'signatures')
+        paths = set()
+        for dirpath, _, link in os.walk(signatures_path):
+            if link:
+                with open(os.path.join(dirpath, link[0]), 'r') as f:
+                    sha = f.read()
+                blob = self._get_blob_path_from_sha(sha)
+                paths.add(blob)
+
+        paths.add(revision_path)
+        return paths
+    
     def get_paths(self, image, tag):
         paths = set()
         
         paths.add(self._get_uploads_path(image))
-        return paths
 
+        manifests_path = self._get_manifests_path(image, tag)
+        paths.add(manifests_path)
+
+        manifest_link = os.path.join(manifests_path, 'current/link')
+
+        manifest_sha = self.storage.read_file(manifest_link)
+        manifest_path = self._get_blob_path_from_sha(manifest_sha)
+        paths.add(manifest_path)
+
+        manifest = json.loads(self.storage.read_file(manifest_path))
+        paths.update(self._get_layers(image, manifest))
+
+        paths.update(self._get_signature_blob_paths(manifest_sha, image))
+
+        return paths
+    
     def copy_paths(self, paths, output_dir):
         for path in paths:
             if path:
+                # ORANGE:
+                # Still needs some refactoring to make non-local storage work
                 self.storage.check_path(path)
                 rel_path = os.path.relpath(path, self.storage.data_dir)
                 new_path = os.path.join(output_dir, rel_path)
                 new_dir = os.path.dirname(new_path)
-                try:
-                    os.makedirs(new_dir)
-                except OSError:
-                    pass
+                _ensure_dir(new_dir)
                 if os.path.isdir(path):
-                    os.makedirs(new_path)
+                    _ensure_dir(new_path)
                 self.storage.copy(path, new_path)
 
 
-def split_image_and_tag(full_image_name):
+def _split_image_and_tag(full_image_name):
     if ':' in full_image_name:
         return full_image_name.split(':')
     return full_image_name, 'latest'
@@ -163,7 +137,7 @@ def main(args):
     paths = set()
 
     for img in args.image:
-        image, tag = split_image_and_tag(img)
+        image, tag = _split_image_and_tag(img)
         paths.update(scraper.get_paths(image, tag))
 
     pprint(paths)

@@ -5,7 +5,7 @@ class PathNotFound(Exception):
 
 
 def _copy_file(path, new_path):
-    os.system('rsync -avzr {} {}'.format(
+    os.system('rsync -azr {} {}'.format(
               path, new_path))
 
 
@@ -20,11 +20,12 @@ class LocalStorage(object):
 
     def copy(self, path, new_path):
         if os.path.isdir(path):
-            for dirpath, dirs, files in os.walk(path):
-                for f in files:
-                    _copy_file(os.path.join(dirpath, f), new_path)
-                for d in dirs:
-                    _copy_file(os.path.join(dirpath, d), new_path)
+            for item in os.listdir(path):
+                _copy_file(os.path.join(path, item), new_path)
         else:
             _copy_file(path, new_path)
 
+    def read_file(self, path):
+        with open(path, 'r') as f:
+            out = f.read()
+        return out
