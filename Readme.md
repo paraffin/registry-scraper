@@ -3,7 +3,8 @@
 This is a simple tool to pull particular images from a Docker registry, preserving the Docker
 registry file structure, in essence creating a 'shallow clone' of a registry. This is useful for
 example if you want to ship a registry containing only a subset of the images contained in a
-registry.
+privately hosted registry (Docker registry currently only allows mirroring of Docker Hub, not
+private registries).
 
 It requires direct access to the storage backend of the registry; it does not use the registry API.
 
