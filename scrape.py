@@ -19,7 +19,7 @@ class Scraper():
             from storage_drivers.local import LocalStorage
             self.storage = LocalStorage(args.data_dir)
         elif args.storage_type == 's3':
-            from storage_drivers import S3Storage
+            from storage_drivers.s3 import S3Storage
             self.storage = S3Storage(args.data_dir)
 
     def _get_uploads_path(self, image):
@@ -121,7 +121,8 @@ class Scraper():
                 _ensure_dir(new_dir)
                 if self.storage.isdir(path):
                     _ensure_dir(new_path)
-                self.storage.copy(path, new_path)
+                if '_uploads' not in path:
+                    self.storage.copy(path, new_path)
 
 
 def _split_image_and_tag(full_image_name):
@@ -136,6 +137,7 @@ def main(args):
     for img in args.image:
         image, tag = _split_image_and_tag(img)
         paths.update(scraper.get_paths(image, tag))
+    pprint(paths)
     scraper.copy_paths(paths, args.output_dir)
 
 
