@@ -2,6 +2,7 @@ import os
 
 from boto import connect_s3
 from boto.s3.key import Key
+from boto.exception import S3ResponseError
 
 class PathNotFound(Exception):
     pass
@@ -55,7 +56,11 @@ class S3Storage(object):
         path = self._remove_bucket_name(full_path)
         key = Key(self.bucket)
         key.key = path
-        return key.get_contents_as_string()
+        try:
+            return key.get_contents_as_string()
+        except S3ResponseError as e:
+            print("FATAL ERROR: Failed to find file at path {}".format(path))
+            raise
 
     def isdir(self, full_path):
         path = self._remove_bucket_name(full_path)
@@ -63,4 +68,9 @@ class S3Storage(object):
             return True
         return False
 
-
+    def walk_files(self, full_path):
+        path = self._remove_bucket_name(full_path)
+        all_keys = self.bucket.list(path+'/')
+        all_files = [os.path.join(self.data_dir, key.name) for key in all_keys]
+        for f in all_files:
+            yield f

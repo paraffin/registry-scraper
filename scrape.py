@@ -80,11 +80,10 @@ class Scraper():
         signatures_path = os.path.join(revision_path,
                                        'signatures')
         paths = set()
-        for dirpath, _, link in os.walk(signatures_path):
-            if link:
-                sha = self.storage.read_file(os.path.join(dirpath, link[0]))
-                blob = self._get_blob_path_from_sha(sha)
-                paths.add(blob)
+        for link in self.storage.walk_files(signatures_path):
+            sha = self.storage.read_file(link)
+            blob = self._get_blob_path_from_sha(sha)
+            paths.add(blob)
 
         paths.add(revision_path)
         return paths
@@ -112,8 +111,6 @@ class Scraper():
     def copy_paths(self, paths, output_dir):
         for path in paths:
             if path:
-                # ORANGE:
-                # Still needs some refactoring to make non-local storage work
                 self.storage.check_path(path)
                 rel_path = os.path.relpath(path, self.storage.data_dir)
                 new_path = os.path.join(output_dir, rel_path)

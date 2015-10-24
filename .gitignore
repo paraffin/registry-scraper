@@ -4,3 +4,4 @@
 *.pyc
 data
 data-copy
+s3copy

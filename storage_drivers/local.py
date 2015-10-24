@@ -32,3 +32,8 @@ class LocalStorage(object):
 
     def isdir(self, path):
         return os.path.isdir(path)
+
+    def walk_files(self, path):
+        for dirname, _, flist in os.walk(path):
+            for fname in flist:
+                yield os.path.join(dirname, fname)
