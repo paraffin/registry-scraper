@@ -7,24 +7,43 @@ privately hosted registry (Docker registry currently only allows mirroring of Do
 private registries).
 
 It requires direct access to the storage backend of the registry; it does not use the registry API.
+This means you must either run it on the same machine as a local storage backed registry or have
+access rights to an S3-backed registry. Other file storage backends are not currently supported.
 
 ## Running the Scraper
 
-Currently only the local file storage backend is supported and the script must be run on the same
-machine as the registry.
+The first step is to run a registry backed by local storage or S3. If you already have one, move on
+to `Populate With Images`.
 
-### Run a Local Registry
+### Run a Local Storage Registry
 
-The first step should be to run the registry. If you haven't already, ensure that your Docker daemon
-is running with the option `--insecure-registry localhost:5000`.
+If you haven't already, ensure that your Docker daemon is running with the option
+`--insecure-registry localhost:5000`.
 
-To run a registry, run `make run-initial-registry` or do it manually with
+To run a registry, run `make run-local-storage-registry` in the tests directory or do it manually
+ with
 
 ```bash
 docker run -d -p 5000:5000 --restart=always --name registry \
 	-v `pwd`/data:/var/lib/registry \
 	registry:2
 ```
+
+### Run an S3-backed registry
+
+If you haven't already, ensure that your Docker daemon
+is running with the option `--insecure-registry localhost:5000`.
+
+To run a registry, run `make run-s3-storage-registry` in the tests directory or do it manually with
+
+```bash
+docker run -d -p 5000:5000 --restart=always --name registry \
+	-v `pwd`/data:/var/lib/registry \
+	registry:2
+```
+
+Note that for testing purposes, the make target actually runs the registry on port 5002, so you
+will need to change the commands below to use `localhost:5002`.
 
 ### Populate With Images
 
@@ -41,7 +60,13 @@ docker push localhost:5000/someimage:mytag
 Now just run the `scrape.py` script:
 
 ```bash
-./scrape.py someimage:mytag --data-dir `pwd`/data --output-dir `pwd`/data-copy
+./scrape.py --storage local --data-dir `pwd`/data --output-dir `pwd`/data-copy someimage:mytag 
+```
+
+Or for S3:
+
+```bash
+./scrape.py --storage s3 --data-dir bucket-name --output-dir `pwd`/data-copy someimage:mytag 
 ```
 
 If you don't specify a tag it will default to the `latest` tag.
@@ -61,6 +86,8 @@ docker run -d -p 5000:5000 --restart=always --name registry \
 ## Testing
 
 Currently there are no unit tests for this script, only end-to-end tests.
+
+The tests are intended to be run in a Python virtual environment.
 
 ### Local Storage Backend
 
