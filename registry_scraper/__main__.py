@@ -128,17 +128,7 @@ def _split_image_and_tag(full_image_name):
     return full_image_name, 'latest'
 
 
-def main(args):
-    scraper = Scraper(args)
-    paths = set()
-    for img in args.image:
-        image, tag = _split_image_and_tag(img)
-        paths.update(scraper.get_paths(image, tag))
-    pprint(paths)
-    scraper.copy_paths(paths, args.output_dir)
-
-
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('image', type=str, nargs='+',
                         help="Name of image to scrape. Don't include registry name.\
@@ -153,4 +143,14 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
 
-    main(args)
+    scraper = Scraper(args)
+    paths = set()
+    for img in args.image:
+        image, tag = _split_image_and_tag(img)
+        paths.update(scraper.get_paths(image, tag))
+    pprint(paths)
+    scraper.copy_paths(paths, args.output_dir)
+
+
+if __name__ == '__main__':
+    main()

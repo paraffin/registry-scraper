@@ -4,5 +4,8 @@
 *.pyc
 tests/data
 tests/data-copy
-tests/s3copy
+tests/s3-copy
 tests/registry-config.env
+build/
+dist/
+registry_scraper.egg-info/

@@ -25,8 +25,8 @@ IMAGE_NAME ?= busybox
 
 S3_BUCKET ?= $(shell grep -i s3_bucket registry-config.env | cut -d'=' -f2)
 
-install-requirements:
-	pip install -r ../requirements.txt
+install-scrape:
+	cd ../ && make install
 
 pull-test-image-internet:
 	docker pull $(DOCKER_REMOTE)/$(IMAGE_NAME)
@@ -39,8 +39,8 @@ run-local-storage-registry:
 
 run-s3-storage-registry:
 	REGISTRY_STORAGE_S3_ACCESSKEY=$$AWS_ACCESS_KEY_ID \
-    REGISTRY_STORAGE_S3_SECRETKEY=$$AWS_SECRET_KEY \
-    REGISTRY_STORAGE_S3_BUCKET=$$AWS_SECRET_KEY \
+	REGISTRY_STORAGE_S3_SECRETKEY=$$AWS_SECRET_KEY \
+	REGISTRY_STORAGE_S3_BUCKET=$(S3_BUCKET) \
 	docker run -d -p 5002:5000 --restart=always --name registry-s3 \
 	    --env-file=registry-config.env \
 		registry:2
@@ -54,11 +54,11 @@ push-image-s3-storage: run-s3-storage-registry pull-test-image-internet
 	docker tag -f $(DOCKER_REMOTE)/$(IMAGE_NAME) localhost:5002/$(IMAGE_NAME)
 	docker push localhost:5002/$(IMAGE_NAME)
 
-scrape-local: push-image-local-storage install-requirements
-	../scrape.py $(IMAGE_NAME)
+scrape-local: push-image-local-storage install-scrape
+	scrape $(IMAGE_NAME)
 
-scrape-s3: push-image-s3-storage install-requirements
-	../scrape.py -s s3 -d $(S3_BUCKET) -o s3-copy $(IMAGE_NAME)
+scrape-s3: push-image-s3-storage install-scrape
+	scrape -s s3 -d $(S3_BUCKET) -o s3-copy $(IMAGE_NAME)
 
 run-local-storage-test-registry: scrape-local
 	docker run -d -p 5001:5000 --restart=always --name registry-local \
@@ -91,7 +91,7 @@ delete-images:
          localhost:5000/$(IMAGE_NAME) \
          localhost:5001/$(IMAGE_NAME) \
          localhost:5002/$(IMAGE_NAME) \
-	     localhost:5003/$(IMAGE_NAME)
+	 localhost:5003/$(IMAGE_NAME)
 
 stop-registry:
 	-docker stop registry
