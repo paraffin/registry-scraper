@@ -3,6 +3,12 @@
 install-requirements:
 	pip install -r requirements.txt
 
-test: install-requirements
+pytest: install-requirements
 	py.test .
+
+lint: install-requirements
+	pep8 ../../registry_scraper/
+	pep8 .
+
+test: lint pytest
 
