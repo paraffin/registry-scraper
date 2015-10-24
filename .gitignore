@@ -2,10 +2,10 @@
 *.swo
 *.swn
 *.pyc
-tests/data
-tests/data-copy
-tests/s3-copy
-tests/registry-config.env
+tests/e2e/data
+tests/e2e/data-copy
+tests/e2e/s3-copy
+tests/e2e/registry-config.env
 build/
 dist/
 registry_scraper.egg-info/
