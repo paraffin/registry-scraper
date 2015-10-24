@@ -60,8 +60,23 @@ docker run -d -p 5000:5000 --restart=always --name registry \
 
 ## Testing
 
-Currently there are no unit tests for this script. To run a functional end-to-end test, simply run
-`make clean && make test`. This will download the busybox:latest docker image, run a local storage
-registry, push the image, run the scraper, test that the new directory structure is identical to
-the original one, and finally attempt to pull the image from a new registry and run a simple
-command in a container using that image.
+Currently there are no unit tests for this script, only end-to-end tests.
+
+### Local Storage Backend
+
+To run a test using the local storage backend, simply rm `make clean && make test-local` in the tests
+directory. This will download the latest progrium/busybox image, run a local-storage backed
+registry, push the image to the registry, run the scrape command, and then test a pull from a
+registry backed by the scraped image.
+
+### S3 Storage Backend
+
+If you have AWS credentials with access to an S3 bucket you can use for testing, you can also test
+the S3 storage backend scraper.
+
+First, copy `tests/registry-config.env.example` to `tests/registry-config.env` and fill in the
+bucket details. Second, export your AWS access credentials to the environment variables
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_KEY`. Now you can run `make clean && make test-s3`. This will do
+the same test as the local storage backend test, except it will create and scrape from a registry
+backed by S3 storage.
+
