@@ -9,7 +9,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'registry_scraper = registry_scraper.__main__:main'
+            'scrape = registry_scraper.__main__:main'
         ]
     }
 )
