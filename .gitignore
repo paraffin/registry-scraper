@@ -2,6 +2,7 @@
 *.swo
 *.swn
 *.pyc
-data
-data-copy
-s3copy
+tests/data
+tests/data-copy
+tests/s3copy
+tests/registry-config.env
