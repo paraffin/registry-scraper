@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='registry_scraper',
     version='0.0.1',
-    packages=['registry_scraper']),
+    packages=find_packages(exclude=['tests']),
     install_requires=[
         'boto==2.38.0'
     ],
