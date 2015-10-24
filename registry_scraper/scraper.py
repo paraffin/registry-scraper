@@ -11,13 +11,13 @@ def _ensure_dir(path):
 
 class Scraper():
 
-    def __init__(self, args):
-        if args.storage_type == 'local':
+    def __init__(self, storage_type, data_dir):
+        if storage_type == 'local':
             from storage_drivers.local import LocalStorage
-            self.storage = LocalStorage(args.data_dir)
-        elif args.storage_type == 's3':
+            self.storage = LocalStorage(data_dir)
+        elif storage_type == 's3':
             from storage_drivers.s3 import S3Storage
-            self.storage = S3Storage(args.data_dir)
+            self.storage = S3Storage(data_dir)
 
     def _get_uploads_path(self, image):
         return os.path.join(self.storage.data_dir,

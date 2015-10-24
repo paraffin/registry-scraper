@@ -23,7 +23,7 @@ def main():
     
     args = parser.parse_args()
 
-    scraper = Scraper(args)
+    scraper = Scraper(args.storage_type, args.data_dir)
     paths = set()
     for img in args.image:
         image, tag = _split_image_and_tag(img)
