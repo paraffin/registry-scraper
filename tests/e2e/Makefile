@@ -26,7 +26,7 @@ IMAGE_NAME ?= busybox
 S3_BUCKET ?= $(shell grep -i s3_bucket registry-config.env | cut -d'=' -f2)
 
 install-scrape:
-	cd ../ && make install
+	cd ../../ && make install
 
 pull-test-image-internet:
 	docker pull $(DOCKER_REMOTE)/$(IMAGE_NAME)

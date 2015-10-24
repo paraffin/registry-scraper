@@ -20,7 +20,7 @@ to `Populate With Images`.
 If you haven't already, ensure that your Docker daemon is running with the option
 `--insecure-registry localhost:5000`.
 
-To run a registry, run `make run-local-storage-registry` in the tests directory or do it manually
+To run a registry, run `make run-local-storage-registry` in the tests/e2e directory or do it manually
  with
 
 ```bash
@@ -34,7 +34,7 @@ docker run -d -p 5000:5000 --restart=always --name registry \
 If you haven't already, ensure that your Docker daemon
 is running with the option `--insecure-registry localhost:5000`.
 
-To run a registry, run `make run-s3-storage-registry` in the tests directory or do it manually with
+To run a registry, run `make run-s3-storage-registry` in the tests/e2e directory or do it manually with
 
 ```bash
 docker run -d -p 5000:5000 --restart=always --name registry \
@@ -57,16 +57,18 @@ docker push localhost:5000/someimage:mytag
 
 ### Scrape Images
 
-Now just run the `scrape.py` script:
+Install with `make install`
+
+Now just run the `scrape` script:
 
 ```bash
-./scrape.py --storage local --data-dir `pwd`/data --output-dir `pwd`/data-copy someimage:mytag 
+scrape --storage local --data-dir `pwd`/data --output-dir `pwd`/data-copy someimage:mytag 
 ```
 
 Or for S3:
 
 ```bash
-./scrape.py --storage s3 --data-dir bucket-name --output-dir `pwd`/data-copy someimage:mytag 
+scrape --storage s3 --data-dir bucket-name --output-dir `pwd`/data-copy someimage:mytag 
 ```
 
 If you don't specify a tag it will default to the `latest` tag.
