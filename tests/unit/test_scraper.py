@@ -57,7 +57,7 @@ class TestScraper(TestCase):
         expected = set(['fakebucket/docker/registry/v2/repositories/someimage/'
                        '_manifests/revisions/sha256/foo'])
 
-        mock_storage.walk_files.return_value = list(expected)[0]
+        mock_storage.walk_files.return_value = list(expected)
 
         s = Scraper('s3', 'fakebucket')
         rv = s._get_signature_blob_paths('sha256:foo', 'someimage')
