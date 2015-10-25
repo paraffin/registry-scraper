@@ -12,16 +12,16 @@ ifeq ('$(ACK_BIN)','')
 endif
 
 review-tech-debt: install-ack
-	@$(ACK) -A 5 '# YELLOW' . || true
-	@$(ACK) -A 5 '# ORANGE' . || true
-	@$(ACK) -A 5 '# RED' . || true
+	@$(ACK) -A 5 '# YELLOW[\W]' . || true
+	@$(ACK) -A 5 '# ORANGE[\W]' . || true
+	@$(ACK) -A 5 '# RED'[\W] . || true
 
 test-tech-debt: review-tech-debt install-ack
 	@$(info Tech debt totals:)
-	@$(info Yellow: $(shell $(ACK) '# YELLOW' . | wc -l))
-	@$(info Orange: $(shell $(ACK) '# ORANGE' . | wc -l))
-	@$(info Red: $(shell $(ACK) '# RED' . | wc -l))
-	@if $(ACK) '# RED' . ; then \
+	@$(info Yellow: $(shell $(ACK) '# YELLOW[\W]' . | wc -l))
+	@$(info Orange: $(shell $(ACK) '# ORANGE[\W]' . | wc -l))
+	@$(info Red: $(shell $(ACK) '# RED[\W]' . | wc -l))
+	@if $(ACK) '# RED[\W]' . ; then \
 	  	echo "You have RED tech debt! Please don't merge this!"; \
 		exit 2; \
 	fi
