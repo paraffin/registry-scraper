@@ -26,7 +26,7 @@ class S3Storage(object):
     def conn(self):
         if self._conn is None:
             self._conn = connect_s3()
-        return self._conn()
+        return self._conn
 
     @property
     def bucket(self):

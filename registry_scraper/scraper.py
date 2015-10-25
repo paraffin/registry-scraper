@@ -3,6 +3,9 @@ import os
 
 from pprint import pprint
 
+from storage_drivers.local import LocalStorage
+from storage_drivers.s3 import S3Storage
+
 
 def _ensure_dir(path):
     try:
@@ -20,12 +23,17 @@ def _split_image_and_tag(full_image_name):
 class Scraper():
 
     def __init__(self, storage_type, data_dir):
-        if storage_type == 'local':
-            from storage_drivers.local import LocalStorage
-            self.storage = LocalStorage(data_dir)
-        elif storage_type == 's3':
-            from storage_drivers.s3 import S3Storage
-            self.storage = S3Storage(data_dir)
+        self.storage_type = storage_type
+        self.data_dir = data_dir
+        self._storage = None
+
+    @property
+    def storage(self):
+        if self.storage_type == 'local':
+            self._storage = LocalStorage(self.data_dir)
+        elif self.storage_type == 's3':
+            self._storage = S3Storage(self.data_dir)
+        return self._storage
 
     def _get_uploads_path(self, image):
         return os.path.join(self.storage.data_dir,
@@ -84,8 +92,10 @@ class Scraper():
         revision_path = self._get_revision_path_from_sha(sha, image)
         signatures_path = os.path.join(revision_path,
                                        'signatures')
+        print(signatures_path)
         paths = set()
         for link in self.storage.walk_files(signatures_path):
+            print(link)
             sha = self.storage.read_file(link)
             blob = self._get_blob_path_from_sha(sha)
             paths.add(blob)
