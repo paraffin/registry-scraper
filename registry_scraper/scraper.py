@@ -3,21 +3,37 @@ import os
 
 from pprint import pprint
 
+from storage_drivers.local import LocalStorage
+from storage_drivers.s3 import S3Storage
+
+
 def _ensure_dir(path):
     try:
         os.makedirs(path)
     except OSError:
         pass
 
+
+def _split_image_and_tag(full_image_name):
+    if ':' in full_image_name:
+        return full_image_name.split(':')
+    return full_image_name, 'latest'
+
+
 class Scraper():
 
-    def __init__(self, args):
-        if args.storage_type == 'local':
-            from storage_drivers.local import LocalStorage
-            self.storage = LocalStorage(args.data_dir)
-        elif args.storage_type == 's3':
-            from storage_drivers.s3 import S3Storage
-            self.storage = S3Storage(args.data_dir)
+    def __init__(self, storage_type, data_dir):
+        self.storage_type = storage_type
+        self.data_dir = data_dir
+        self._storage = None
+
+    @property
+    def storage(self):
+        if self.storage_type == 'local':
+            self._storage = LocalStorage(self.data_dir)
+        elif self.storage_type == 's3':
+            self._storage = S3Storage(self.data_dir)
+        return self._storage
 
     def _get_uploads_path(self, image):
         return os.path.join(self.storage.data_dir,
@@ -40,7 +56,7 @@ class Scraper():
                             sha[:2],
                             sha,
                             'data')
-    
+
     def _get_layer_link_from_sha(self, image, sha):
         sha_type, sha = sha.split(':')
         return os.path.join(self.storage.data_dir,
@@ -76,18 +92,20 @@ class Scraper():
         revision_path = self._get_revision_path_from_sha(sha, image)
         signatures_path = os.path.join(revision_path,
                                        'signatures')
+        print(signatures_path)
         paths = set()
         for link in self.storage.walk_files(signatures_path):
+            print(link)
             sha = self.storage.read_file(link)
             blob = self._get_blob_path_from_sha(sha)
             paths.add(blob)
 
         paths.add(revision_path)
         return paths
-    
+
     def get_paths(self, image, tag):
         paths = set()
-        
+
         paths.add(self._get_uploads_path(image))
 
         manifests_path = self._get_manifests_path(image, tag)
@@ -104,7 +122,7 @@ class Scraper():
         paths.update(self._get_signature_blob_paths(manifest_sha, image))
 
         return paths
-    
+
     def copy_paths(self, paths, output_dir):
         for path in paths:
             if path:
@@ -117,11 +135,3 @@ class Scraper():
                     _ensure_dir(new_path)
                 if '_uploads' not in path:
                     self.storage.copy(path, new_path)
-
-
-def _split_image_and_tag(full_image_name):
-    if ':' in full_image_name:
-        return full_image_name.split(':')
-    return full_image_name, 'latest'
-
-
