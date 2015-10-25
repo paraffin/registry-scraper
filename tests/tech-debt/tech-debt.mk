@@ -14,7 +14,7 @@ endif
 review-tech-debt: install-ack
 	@$(ACK) -A 5 '# YELLOW[\W]' . || true
 	@$(ACK) -A 5 '# ORANGE[\W]' . || true
-	@$(ACK) -A 5 '# RED'[\W] . || true
+	@$(ACK) -A 5 '# RED[\W]' . || true
 
 test-tech-debt: review-tech-debt install-ack
 	@$(info Tech debt totals:)
