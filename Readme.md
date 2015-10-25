@@ -55,7 +55,7 @@ bucket details. Second, export your AWS access credentials to the environment va
 the same test as the local storage backend test, except it will create and scrape from a registry
 backed by S3 storage.
 
-## Running Registries
+## Registries
 
 If you want to play around outside the e2e testing sandbox, you can use these instructions to create
 your own registries.
@@ -112,3 +112,10 @@ docker run -d -p 5000:5000 --restart=always --name registry \
 	registry:2
 ```
 
+## Contributing
+
+This project is under active development and contributions of all kinds are welcome.
+
+Pull requests will not be accepted if any tests are failing, including PEP8 and technical debt.
+
+Use a maximum line width of 100 characters on any file that is not Python.
