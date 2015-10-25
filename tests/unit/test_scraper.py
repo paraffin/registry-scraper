@@ -56,7 +56,8 @@ class TestScraper(TestCase):
         self.assertEqual(layer_paths, true_paths)
 
     # ORANGE
-    # Still learning mocks. Can't figure out how to get this to do the right thing
+    # Still learning mocks.
+    # Can't figure out how to get this to do the right thing
     @mark.xfail()
     @patch.object(s3.S3Storage, 'walk_files')
     def test_get_signature_blob_paths(self, mock_storage):
