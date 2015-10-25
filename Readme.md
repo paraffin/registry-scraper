@@ -14,7 +14,7 @@ access rights to an S3-backed registry. Other file storage backends are not curr
 
 ### Install
 
-Install with `make install`
+Install with `make install`. This requires an active Python virtualenv.
 
 ### Usage
 
