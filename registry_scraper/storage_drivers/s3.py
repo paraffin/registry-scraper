@@ -19,8 +19,20 @@ def _ensure_dir(path):
 class S3Storage(object):
     def __init__(self, data_dir):
         self.data_dir = data_dir
-        self.conn = connect_s3()
-        self.bucket = self.conn.get_bucket(data_dir)
+        self._bucket = None
+        self._conn = None
+
+    @property
+    def conn(self):
+        if self._conn is None:
+            self._conn = connect_s3()
+        return self._conn()
+
+    @property
+    def bucket(self):
+        if self._bucket is None:
+            self._bucket = self.conn.get_bucket(self.data_dir)
+        return self._bucket
 
     def _remove_bucket_name(self, path):
         return os.path.relpath(path, self.data_dir)

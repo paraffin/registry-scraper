@@ -11,9 +11,9 @@ from scraper import Scraper, _split_image_and_tag
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('image', type=str, nargs='+',
-                        help='Name of image to scrape.'
-                             ' Don't include registry name.
-                             ' eg. myimage:mytag. Tag defaults to latest')
+                        help="Name of image to scrape."
+                             " Don't include registry name."
+                             " eg. myimage:mytag. Tag defaults to latest")
     parser.add_argument('-s', '--storage-type', type=str,
                         choices=['local', 's3'],
                         default='local',

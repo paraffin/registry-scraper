@@ -11,6 +11,12 @@ def _ensure_dir(path):
         pass
 
 
+def _split_image_and_tag(full_image_name):
+    if ':' in full_image_name:
+        return full_image_name.split(':')
+    return full_image_name, 'latest'
+
+
 class Scraper():
 
     def __init__(self, storage_type, data_dir):
@@ -119,9 +125,3 @@ class Scraper():
                     _ensure_dir(new_path)
                 if '_uploads' not in path:
                     self.storage.copy(path, new_path)
-
-
-def _split_image_and_tag(full_image_name):
-    if ':' in full_image_name:
-        return full_image_name.split(':')
-    return full_image_name, 'latest'
