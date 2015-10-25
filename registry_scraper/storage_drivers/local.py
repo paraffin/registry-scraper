@@ -1,5 +1,6 @@
 import os
 
+
 class PathNotFound(Exception):
     pass
 
@@ -16,7 +17,8 @@ class LocalStorage(object):
     def check_path(self, path):
         ''' Check that a path exists. '''
         if not os.path.exists(path):
-            raise PathNotFound("The specified path was not found: {}".format(path))
+            raise PathNotFound("The specified path was not found: {}"
+                               .format(path))
 
     def copy(self, path, new_path):
         if os.path.isdir(path):

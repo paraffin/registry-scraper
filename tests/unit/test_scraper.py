@@ -2,6 +2,7 @@ import unittest
 
 from registry_scraper.scraper import Scraper
 
+
 class TestScraper(unittest.TestCase):
     """
     Test the Scraper
@@ -16,16 +17,18 @@ class TestScraper(unittest.TestCase):
     def test_get_layer_link_from_sha_basic(self):
         s = Scraper('local', 'data-copy')
         sha = 'sha256:abcd123'
-        true_path = 'data-copy/docker/registry/v2/repositories/someimage/_layers/sha256/abcd123/link'
-        self.assertEqual(s._get_layer_link_from_sha('someimage', sha), true_path)
+        true_path = 'data-copy/docker/registry/v2/repositories/someimage/'\
+                    '_layers/sha256/abcd123/link'
+        self.assertEqual(s._get_layer_link_from_sha('someimage', sha),
+                         true_path)
 
     def test_get_layers_basic(self):
         image = 'someimage'
         manifest = {
             'fsLayers': [
-                { 'blobSum': 'sha256:foo' },
-                { 'blobSum': 'sha256:foo' },
-                { 'blobSum': 'sha256:bar' }
+                {'blobSum': 'sha256:foo'},
+                {'blobSum': 'sha256:foo'},
+                {'blobSum': 'sha256:bar'}
                 ]
             }
 
@@ -36,4 +39,3 @@ class TestScraper(unittest.TestCase):
         layer_paths = s._get_layers(image, manifest)
 
         self.assertEqual(layer_paths, true_paths)
-

@@ -4,6 +4,7 @@ from boto import connect_s3
 from boto.s3.key import Key
 from boto.exception import S3ResponseError
 
+
 class PathNotFound(Exception):
     pass
 

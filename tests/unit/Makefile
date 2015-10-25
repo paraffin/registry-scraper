@@ -7,8 +7,8 @@ pytest: install-requirements
 	py.test .
 
 lint: install-requirements
-	pep8 ../../registry_scraper/
-	pep8 .
+	cd ../../ && pep8 registry_scraper/
+	cd ../../ && pep8 tests/unit
 
 test: lint pytest
 

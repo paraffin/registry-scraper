@@ -3,11 +3,13 @@ import os
 
 from pprint import pprint
 
+
 def _ensure_dir(path):
     try:
         os.makedirs(path)
     except OSError:
         pass
+
 
 class Scraper():
 
@@ -40,7 +42,7 @@ class Scraper():
                             sha[:2],
                             sha,
                             'data')
-    
+
     def _get_layer_link_from_sha(self, image, sha):
         sha_type, sha = sha.split(':')
         return os.path.join(self.storage.data_dir,
@@ -84,10 +86,10 @@ class Scraper():
 
         paths.add(revision_path)
         return paths
-    
+
     def get_paths(self, image, tag):
         paths = set()
-        
+
         paths.add(self._get_uploads_path(image))
 
         manifests_path = self._get_manifests_path(image, tag)
@@ -104,7 +106,7 @@ class Scraper():
         paths.update(self._get_signature_blob_paths(manifest_sha, image))
 
         return paths
-    
+
     def copy_paths(self, paths, output_dir):
         for path in paths:
             if path:
@@ -123,5 +125,3 @@ def _split_image_and_tag(full_image_name):
     if ':' in full_image_name:
         return full_image_name.split(':')
     return full_image_name, 'latest'
-
-
