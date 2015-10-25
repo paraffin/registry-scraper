@@ -1,8 +1,6 @@
 import json
 import os
 
-from pprint import pprint
-
 from storage_drivers.local import LocalStorage
 from storage_drivers.s3 import S3Storage
 
