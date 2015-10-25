@@ -92,10 +92,8 @@ class Scraper():
         revision_path = self._get_revision_path_from_sha(sha, image)
         signatures_path = os.path.join(revision_path,
                                        'signatures')
-        print(signatures_path)
         paths = set()
         for link in self.storage.walk_files(signatures_path):
-            print(link)
             sha = self.storage.read_file(link)
             blob = self._get_blob_path_from_sha(sha)
             paths.add(blob)
