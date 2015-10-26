@@ -5,7 +5,7 @@ include tests/tech-debt/tech-debt.mk
 install:
 	python setup.py install
 
-test-unit:
+test-unit: install
 	cd tests/unit && make test
 
 test-e2e:
