@@ -39,7 +39,7 @@ run-local-storage-registry:
 
 run-s3-storage-registry:
 	REGISTRY_STORAGE_S3_ACCESSKEY=$$AWS_ACCESS_KEY_ID \
-	REGISTRY_STORAGE_S3_SECRETKEY=$$AWS_SECRET_KEY \
+	REGISTRY_STORAGE_S3_SECRETKEY=$$AWS_SECRET_ACCESS_KEY \
 	REGISTRY_STORAGE_S3_BUCKET=$(S3_BUCKET) \
 	docker run -d -p 5002:5000 --restart=always --name registry-s3 \
 	    --env-file=registry-config.env \
