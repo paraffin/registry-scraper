@@ -1,9 +1,12 @@
-.PHONY: install
+.PHONY: install build
 
 include tests/tech-debt/tech-debt.mk
 
 install:
 	python setup.py install
+
+build:
+	python setup.py sdist
 
 test-unit: install
 	cd tests/unit && make test

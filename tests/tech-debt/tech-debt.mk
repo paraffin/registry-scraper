@@ -3,8 +3,8 @@
 		review-tech-debt \
 		count-tech-debt
 
-ACK_BIN := $(shell which ack)
-ACK := ack -ri --ignore-dir=.git --ignore-dir=tests/tech-debt
+ACK_BIN := $(shell which ack-grep)
+ACK := ack-grep -ri --ignore-dir=.git --ignore-dir=tests/tech-debt
 
 install-ack:
 ifeq ('$(ACK_BIN)','')
