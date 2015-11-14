@@ -1,6 +1,8 @@
 import json
 import os
 
+from multiprocessing.pool import ThreadPool
+
 from storage_drivers.local import LocalStorage
 from storage_drivers.s3 import S3Storage
 
@@ -112,6 +114,7 @@ class Scraper():
         return paths
 
     def copy_paths(self, paths, output_dir):
+        paths_to_copy = []
         for path in paths:
             if path:
                 self.storage.check_path(path)
@@ -121,7 +124,9 @@ class Scraper():
                 _ensure_dir(new_dir)
                 if self.storage.isdir(path):
                     _ensure_dir(new_path)
-                self.storage.copy(path, new_path)
+                paths_to_copy.append((path, new_path))
+        pool = ThreadPool(processes=10)
+        pool.map(self.storage.copy, paths_to_copy)
 
     def check_paths(self, paths):
         paths_not_found = []

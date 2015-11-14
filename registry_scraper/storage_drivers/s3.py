@@ -54,7 +54,8 @@ class S3Storage(object):
         else:
             print("Path already exists: {}".format(new_path))
 
-    def copy(self, full_path, new_path):
+    def copy(self, paths):
+        full_path, new_path = paths
         path = self._remove_bucket_name(full_path)
         if not self.isdir(full_path):
             new_file = os.path.join(new_path, os.path.basename(path))
