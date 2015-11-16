@@ -20,7 +20,8 @@ class LocalStorage(object):
             raise PathNotFound("The specified path was not found: {}"
                                .format(path))
 
-    def copy(self, path, new_path):
+    def copy(self, paths):
+        path, new_path = paths
         if os.path.isdir(path):
             for item in os.listdir(path):
                 _copy_file(os.path.join(path, item), new_path)
