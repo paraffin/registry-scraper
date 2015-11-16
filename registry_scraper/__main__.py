@@ -22,6 +22,11 @@ def main():
                         help="Registry data directory or S3 bucket")
     parser.add_argument('-o', '--output-dir', type=str, default='data-copy',
                         help="Path to copy to")
+    parser.add_argument('-c', '--check', dest='check', action='store_true',
+                        help="Only check files, don't download them")
+    parser.add_argument('--no-check', dest='check', action='store_false',
+                        help="Download files, don't just check them")
+    parser.set_defaults(check=False)
 
     args = parser.parse_args()
 
@@ -31,7 +36,11 @@ def main():
         image, tag = _split_image_and_tag(img)
         paths.update(scraper.get_paths(image, tag))
     pprint(paths)
-    scraper.copy_paths(paths, args.output_dir)
+    if args.check:
+        scraper.check_paths(paths)
+        print("Image(s) {} successfully checked".format(args.image))
+    else:
+        scraper.copy_paths(paths, args.output_dir)
 
 
 if __name__ == '__main__':

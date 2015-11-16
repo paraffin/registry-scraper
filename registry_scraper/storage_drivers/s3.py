@@ -42,7 +42,8 @@ class S3Storage(object):
         for item in self.bucket.list(path):
             if item is not None:
                 return True
-        return False
+        raise PathNotFound("The specified path was not found: {}"
+                           .format(path))
 
     def _copy_file(self, path, new_path):
         if not os.path.exists(new_path):

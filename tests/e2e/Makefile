@@ -78,10 +78,15 @@ test-local-storage-image: run-local-storage-test-registry
 test-s3-storage-image: run-s3-storage-test-registry
 	docker run --rm localhost:5003/$(IMAGE_NAME) echo "I'm working!"
 
+test-check-local: install-scrape push-image-local-storage
+	scrape --check $(IMAGE_NAME)
+
+test-check-s3: install-scrape push-image-s3-storage
+	scrape -s s3 -d $(S3_BUCKET) --check $(IMAGE_NAME)
 
 test-local: clean test-local-storage-image
 
-test-s3: clean test-s3-storage-image
+test-s3: clean test-s3-storage-image test-check-s3
 
 test: test-local test-s3 
 
