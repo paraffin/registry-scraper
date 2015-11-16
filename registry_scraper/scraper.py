@@ -33,12 +33,6 @@ class Scraper():
             self._storage = S3Storage(self.data_dir)
         return self._storage
 
-    def _get_uploads_path(self, image):
-        return os.path.join(self.storage.data_dir,
-                            'docker/registry/v2/repositories',
-                            image,
-                            '_uploads')
-
     def _get_manifests_path(self, image, tag):
         return os.path.join(self.storage.data_dir,
                             'docker/registry/v2/repositories',
@@ -102,8 +96,6 @@ class Scraper():
     def get_paths(self, image, tag):
         paths = set()
 
-        paths.add(self._get_uploads_path(image))
-
         manifests_path = self._get_manifests_path(image, tag)
         paths.add(manifests_path)
 
@@ -129,5 +121,17 @@ class Scraper():
                 _ensure_dir(new_dir)
                 if self.storage.isdir(path):
                     _ensure_dir(new_path)
-                if '_uploads' not in path:
-                    self.storage.copy(path, new_path)
+                self.storage.copy(path, new_path)
+
+    def check_paths(self, paths):
+        paths_not_found = []
+        for path in paths:
+            if path:
+                try:
+                    self.storage.check_path(path)
+                except PathNotFound:
+                    paths_not_found.append(path)
+        if paths_not_found:
+            raise PathNotFound("The following paths were not found "
+                               "in the registry storage: {}"
+                               .format(paths_not_found))
